@@ -1,0 +1,14 @@
+loss: bce_with_logits
+label_smoothing: 0.1
+optimizer: adamw
+lr: 1.0e-3
+weight_decay: 1.0e-2
+scheduler: cosine_annealing
+batch_size: 32
+max_epochs: 200
+early_stopping_patience: 20
+early_stopping_metric: brier_score   # lower is better
+checkpoint_dir: checkpoints/
+train_cutoff: "2024-09-01"
+val_event: "VCT 2024 Champions"
+augment_team_swap: true

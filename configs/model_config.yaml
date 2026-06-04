@@ -1,0 +1,15 @@
+num_maps: 12               # kept for architecture compatibility; map_idx is always UNKNOWN (11)
+map_embedding_dim: 16      # embedding is a learned constant — effectively a bias term
+num_scalar_features: 16
+raw_feature_dim: 32        # 16 scalars + 16 map embedding
+d_model: 64
+num_heads: 4
+dim_feedforward: 256
+num_layers: 3
+dropout: 0.1
+seq_len: 20
+combined_dim: 128          # d_model * 2 after concat
+ffnn_dims: [64, 32]
+ffnn_dropout: 0.2
+num_metas: 37              # 36 defined meta periods + 1 unknown (ID 36)
+meta_embed_dim: 64         # meta embedding projected directly to d_model
