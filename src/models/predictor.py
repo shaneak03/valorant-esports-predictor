@@ -60,8 +60,9 @@ class ValorantPredictor(nn.Module):
             num_layers=num_layers,
             dropout=encoder_dropout,
         )
+        # +2 for (elo_diff, elo_sum) appended after the transformer representations
         self.head = ClassifierHead(
-            in_dim=d_model * 2,
+            in_dim=d_model * 2 + 2,
             hidden_dims=classifier_hidden,
             dropout=classifier_dropout,
         )
@@ -86,13 +87,21 @@ class ValorantPredictor(nn.Module):
         pad_mask_b: torch.Tensor,
         meta_idx_a: torch.Tensor,
         meta_idx_b: torch.Tensor,
+        elo_a: torch.Tensor,      # (B,) normalised Elo for team_a
+        elo_b: torch.Tensor,      # (B,) normalised Elo for team_b
     ) -> torch.Tensor:            # (B, 1)
         repr_a = self.encode_team(scalars_a, map_idx_a, pad_mask_a, meta_idx_a)
         repr_b = self.encode_team(scalars_b, map_idx_b, pad_mask_b, meta_idx_b)
-        # Symmetric combination: [a-b, a+b] so swapping A↔B only flips the sign
-        # of the difference, forcing the head to learn order-invariant features.
+
+        # Transformer representations: symmetric combination
         combined = torch.cat([repr_a - repr_b, repr_a + repr_b], dim=-1)  # (B, 2*d_model)
-        return self.head(combined)                                          # (B, 1)
+
+        # Append current Elo signals: difference (who is stronger) + sum (match quality)
+        elo_diff = (elo_a - elo_b).unsqueeze(-1)   # (B, 1)
+        elo_sum  = (elo_a + elo_b).unsqueeze(-1)   # (B, 1)
+        combined = torch.cat([combined, elo_diff, elo_sum], dim=-1)  # (B, 2*d_model+2)
+
+        return self.head(combined)                                     # (B, 1)
 
     def predict_proba(self, *args, **kwargs) -> torch.Tensor:
         """Return P(team_a wins) as a probability in [0, 1]."""

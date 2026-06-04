@@ -40,4 +40,6 @@ class TeamSwapDataset(Dataset):
             "meta_idx_b": sample["meta_idx_a"],
             "pad_mask_b": sample["pad_mask_a"],
             "label": 1.0 - sample["label"],
+            "elo_a": sample["elo_b"],
+            "elo_b": sample["elo_a"],
         }

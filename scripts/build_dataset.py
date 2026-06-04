@@ -44,13 +44,16 @@ def update_elo(elo_a: float, elo_b: float, won_a: bool) -> tuple[float, float]:
     return elo_a + delta, elo_b - delta
 
 
-def build_elo_map(matches: list[dict]) -> dict[str, list[tuple[str, float]]]:
+def build_elo_map(matches: list[dict]) -> tuple[dict, dict]:
     """
-    Returns: team_name -> list of (match_date, elo_before_match)
-    Matches must be in chronological order.
+    Returns:
+      elo_history : team -> [(date, opponent_elo_before, match_id)]
+      self_elo    : match_id -> (elo_a_before, elo_b_before)
+                    — each team's OWN Elo right before that match.
     """
     elo: dict[str, float] = defaultdict(lambda: ELO_INIT)
     history: dict[str, list] = defaultdict(list)
+    self_elo: dict[int, tuple[float, float]] = {}
 
     for m in sorted(matches, key=lambda x: x.get("date") or ""):
         ta, tb = m["team_a"], m["team_b"]
@@ -58,13 +61,14 @@ def build_elo_map(matches: list[dict]) -> dict[str, list[tuple[str, float]]]:
         elo_b_before = elo[tb]
         history[ta].append((m["date"], elo_b_before, m["match_id"]))
         history[tb].append((m["date"], elo_a_before, m["match_id"]))
+        self_elo[m["match_id"]] = (elo_a_before, elo_b_before)
         won_a = m["winner"] == 0
         elo[ta], elo[tb] = update_elo(elo_a_before, elo_b_before, won_a)
 
-    return history
+    return history, self_elo
 
 
-def build_samples(matches: list[dict], elo_history: dict) -> list[dict]:
+def build_samples(matches: list[dict], elo_history: dict, self_elo: dict) -> list[dict]:
     """
     For each match, build (history_a, history_b) feature windows and return samples.
     History is strictly from before the target match date.
@@ -85,6 +89,11 @@ def build_samples(matches: list[dict], elo_history: dict) -> list[dict]:
         history_a = _build_team_history(ta, m["match_id"], target_date, team_matches[ta], elo_history)
         history_b = _build_team_history(tb, m["match_id"], target_date, team_matches[tb], elo_history)
 
+        # Each team's own Elo right before this match, normalised to ~[-2, +2]
+        raw_elo_a, raw_elo_b = self_elo.get(m["match_id"], (ELO_INIT, ELO_INIT))
+        elo_a_norm = (raw_elo_a - ELO_INIT) / 400.0
+        elo_b_norm = (raw_elo_b - ELO_INIT) / 400.0
+
         samples.append({
             "match_id": m["match_id"],
             "date": target_date,
@@ -94,6 +103,8 @@ def build_samples(matches: list[dict], elo_history: dict) -> list[dict]:
             "tournament_tier": m.get("tournament_tier", 0),
             "history_a": history_a,
             "history_b": history_b,
+            "elo_a": float(elo_a_norm),
+            "elo_b": float(elo_b_norm),
         })
 
     return samples
@@ -185,10 +196,10 @@ def main():
         log.info("Franchise filter: kept %d matches (removed %d).", len(matches), before - len(matches))
 
     log.info("Computing Elo ratings...")
-    elo_history = build_elo_map(matches)
+    elo_history, self_elo = build_elo_map(matches)
 
     log.info("Building samples with history windows...")
-    samples = build_samples(matches, elo_history)
+    samples = build_samples(matches, elo_history, self_elo)
     log.info("Built %d samples.", len(samples))
 
     # --- Split ---

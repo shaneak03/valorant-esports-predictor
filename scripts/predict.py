@@ -82,6 +82,27 @@ def main():
     if not hist_b:
         log.warning("No history found for '%s'. Using empty history (heavy padding).", args.team_b)
 
+    # Compute each team's current Elo by replaying all matches up to prediction date
+    ELO_INIT = 1500.0
+    elo_ratings: dict[str, float] = {}
+    for s in sorted(all_samples, key=lambda x: x["date"]):
+        if s["date"] >= args.date:
+            break
+        ta, tb = s["team_a"], s["team_b"]
+        ea = elo_ratings.get(ta, ELO_INIT)
+        eb = elo_ratings.get(tb, ELO_INIT)
+        exp_a = 1 / (1 + 10 ** ((eb - ea) / 400))
+        delta = 32 * ((1.0 if s["winner"] == 0 else 0.0) - exp_a)
+        elo_ratings[ta] = ea + delta
+        elo_ratings[tb] = eb - delta
+
+    raw_elo_a = elo_ratings.get(args.team_a, ELO_INIT)
+    raw_elo_b = elo_ratings.get(args.team_b, ELO_INIT)
+    elo_a_norm = (raw_elo_a - ELO_INIT) / 400.0
+    elo_b_norm = (raw_elo_b - ELO_INIT) / 400.0
+    log.info("Current Elo — %s: %.0f  |  %s: %.0f",
+             args.team_a, raw_elo_a, args.team_b, raw_elo_b)
+
     # Build a single sample
     sample = {
         "match_id": -1,
@@ -91,6 +112,8 @@ def main():
         "winner": 0,  # dummy
         "history_a": hist_a[-20:],
         "history_b": hist_b[-20:],
+        "elo_a": elo_a_norm,
+        "elo_b": elo_b_norm,
     }
 
     ds = MatchDataset([sample])
@@ -127,11 +150,13 @@ def main():
             batch["scalars_a"], batch["map_idx_a"], batch["pad_mask_a"],
             batch["scalars_b"], batch["map_idx_b"], batch["pad_mask_b"],
             batch["meta_idx_a"], batch["meta_idx_b"],
+            batch["elo_a"], batch["elo_b"],
         ).squeeze()
         logit_ba = model(
             batch["scalars_b"], batch["map_idx_b"], batch["pad_mask_b"],
             batch["scalars_a"], batch["map_idx_a"], batch["pad_mask_a"],
             batch["meta_idx_b"], batch["meta_idx_a"],
+            batch["elo_b"], batch["elo_a"],   # Elo swapped for B vs A ordering
         ).squeeze()
         prob_a_fwd = torch.sigmoid(logit_ab / T)
         prob_a_rev = 1.0 - torch.sigmoid(logit_ba / T)  # P(A wins) = 1 - P(B wins)

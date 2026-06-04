@@ -60,6 +60,9 @@ class MatchDataset(Dataset):
             "meta_idx_b": torch.tensor(meta_idx_b, dtype=torch.long),
             "pad_mask_b": torch.tensor(mask_b, dtype=torch.bool),
             "label": torch.tensor(label, dtype=torch.float32),
+            # Current Elo of each team at match time, normalised: (elo - 1500) / 400
+            "elo_a": torch.tensor(s.get("elo_a", 0.0), dtype=torch.float32),
+            "elo_b": torch.tensor(s.get("elo_b", 0.0), dtype=torch.float32),
         }
 
     @staticmethod

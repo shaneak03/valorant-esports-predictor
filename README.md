@@ -8,13 +8,14 @@ Built to predict Masters London 2026 matches.
 
 ## How It Works
 
-Each match in a team's recent history is encoded as a 16-feature vector (round win rates, attack/defense rates, pistol win rates, opponent Elo, etc.). These 20 vectors form a sequence fed into a shared Transformer encoder — the same weights process both teams, producing two team representations. These are combined symmetrically as `[repr_a − repr_b, repr_a + repr_b]` and passed through a FFNN to output P(team_a wins).
+Each match in a team's recent history is encoded as a 16-feature vector (round win rates, attack/defense rates, pistol win rates, opponent Elo, etc.). These 20 vectors form a sequence fed into a shared Transformer encoder — the same weights process both teams, producing two team representations. These are combined symmetrically alongside each team's **current Elo rating** and passed through a FFNN to output P(team_a wins).
 
 ```
 team_a history (20 matches) ──┐
                                ├── Shared Transformer → repr_a ──┐
-team_b history (20 matches) ──┘                                   ├── [a-b, a+b] → FFNN → P(A wins)
+team_b history (20 matches) ──┘                                   ├── [a-b, a+b, elo_diff, elo_sum] → FFNN → P(A wins)
                                                        repr_b ───┘
+current Elo_a, Elo_b ─────────────────────────────────────────────┘
 ```
 
 Inference is symmetric: both orderings (A vs B) and (B vs A) are run and averaged, so the output is identical regardless of which team you call team_a.
@@ -174,8 +175,8 @@ val_esports_predictor/
 |---|---|
 | `match_encoder.py` | Projects each match token to 64 dims: looks up 16-dim map embedding, concatenates with 16 scalar features → `Linear(32→64)` + `LayerNorm`, then adds a learned meta period embedding (which Valorant act/patch the match was in). |
 | `transformer.py` | `TeamEncoder`: runs a 3-layer `TransformerEncoder` (d=64, heads=4, ff=256, Pre-LN, GELU, dropout=0.1), mean-pools over non-padded positions to get a single team representation. Same weights used for both teams. |
-| `classifier.py` | `ClassifierHead`: takes `[repr_a − repr_b, repr_a + repr_b]` (128-dim symmetric combination), applies `Linear(128→64)→GELU→Dropout→Linear(64→32)→GELU→Dropout→Linear(32→1)`. |
-| `predictor.py` | `ValorantPredictor`: wires together `MatchEncoder`, `TeamEncoder` (shared), and `ClassifierHead`. |
+| `classifier.py` | `ClassifierHead`: takes the 130-dim combined vector, applies `Linear(130→64)→GELU→Dropout→Linear(64→32)→GELU→Dropout→Linear(32→1)`. |
+| `predictor.py` | `ValorantPredictor`: wires together `MatchEncoder`, `TeamEncoder` (shared), and `ClassifierHead`. Appends `(elo_a − elo_b, elo_a + elo_b)` to the 128-dim transformer output before the classifier. |
 
 ### Training (`src/training/`)
 
@@ -217,6 +218,8 @@ val_esports_predictor/
 Each token also carries two embeddings added on top:
 - **Map embedding** (16-dim): which map was played
 - **Meta period embedding** (64-dim): which Valorant act/patch the match was played in (36 defined periods + unknown)
+
+In addition, each team's **current Elo** at prediction time is passed directly to the classifier (not through the transformer), giving the model an explicit "who is stronger right now" signal alongside the sequential match history.
 
 ---
 

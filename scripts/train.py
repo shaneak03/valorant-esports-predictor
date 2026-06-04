@@ -109,6 +109,7 @@ def main():
                 batch["scalars_a"], batch["map_idx_a"], batch["pad_mask_a"],
                 batch["scalars_b"], batch["map_idx_b"], batch["pad_mask_b"],
                 batch["meta_idx_a"], batch["meta_idx_b"],
+                batch["elo_a"], batch["elo_b"],
             ).squeeze(-1)
             all_logits.append(logits.cpu().numpy())
             all_labels.append(batch["label"].cpu().numpy())

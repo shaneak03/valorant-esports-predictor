@@ -93,6 +93,7 @@ class Trainer:
                 batch["scalars_a"], batch["map_idx_a"], batch["pad_mask_a"],
                 batch["scalars_b"], batch["map_idx_b"], batch["pad_mask_b"],
                 batch["meta_idx_a"], batch["meta_idx_b"],
+                batch["elo_a"], batch["elo_b"],
             )
             loss = self.criterion(logits, batch["label"])
             loss.backward()
@@ -112,6 +113,7 @@ class Trainer:
                 batch["scalars_a"], batch["map_idx_a"], batch["pad_mask_a"],
                 batch["scalars_b"], batch["map_idx_b"], batch["pad_mask_b"],
                 batch["meta_idx_a"], batch["meta_idx_b"],
+                batch["elo_a"], batch["elo_b"],
             )
             loss = self.criterion(logits, batch["label"])
             total_loss += loss.item() * len(batch["label"])
