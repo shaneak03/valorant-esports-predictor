@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --color-vbase:   #0A0C10;
+  --color-vcard:   #0F1419;
+  --color-velev:   #151D28;
+  --color-vborder: #1C2A38;
+  --color-accent:  #FF4655;
+  --color-vcream:  #ECE8E1;
+  --color-vmuted:  #6B7E8F;
+  --color-vgold:   #C9AA71;
+
+  --font-display: var(--font-barlow);
+  --font-sans:    var(--font-inter);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background-color: #0A0C10;
+  background-image:
+    radial-gradient(ellipse 90% 45% at 50% -5%, rgba(255,70,85,0.08) 0%, transparent 65%),
+    radial-gradient(circle, #1C2A38 1px, transparent 1px);
+  background-size: 100%, 28px 28px;
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: #ECE8E1;
+  /* reserve space for fixed nav: 32px red strip + 46px tab bar */
+  padding-top: 78px;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 16px rgba(255,70,85,0.2); }
+  50%       { box-shadow: 0 0 28px rgba(255,70,85,0.45); }
+}
+
+.animate-fade-in-up  { animation: fadeInUp 0.45s cubic-bezier(0.16,1,0.3,1) both; }
+.animate-pulse-glow  { animation: pulse-glow 2.4s ease-in-out infinite; }

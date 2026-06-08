@@ -20,9 +20,12 @@ TEAM_ALIASES: dict[str, str] = {
     "NRG":                      "NRG",
     "NRG Esports":              "NRG",
     "LOUD":                     "LOUD",
-    "LEVIATÁN":                 "LEVIATÁN",
+    "LEVIATÁN":            "LEVIATÁN",   # VLR.gg scraped name (U+00C1 Á)
+    "LEVIATAN":                 "LEVIATÁN",   # plain-ASCII alias
+    "LEV":                      "LEVIATÁN",
     "KRÜ Esports":              "KRÜ Esports",
     "G2 Esports":               "G2 Esports",
+    "G2":                       "G2 Esports",
     "MIBR":                     "MIBR",
     "ENVY":                     "ENVY",
     "FURIA":                    "FURIA",
@@ -33,12 +36,17 @@ TEAM_ALIASES: dict[str, str] = {
     "Natus Vincere":            "Natus Vincere",
     "NAVI":                     "Natus Vincere",
     "Team Vitality":            "Team Vitality",
+    "Vitality":                 "Team Vitality",
+    "Vit":                      "Team Vitality",
     "Karmine Corp":             "Karmine Corp",
     "Gentle Mates":             "Gentle Mates",
     "BBL Esports":              "BBL Esports",
     "GIANTX":                   "GIANTX",
     "FUT Esports":              "FUT Esports",
+    "FUT":                      "FUT Esports",
     "Team Heretics":            "Team Heretics",
+    "Heretics":                 "Team Heretics",
+    "TH":                       "Team Heretics",
     "Eternal Fire":             "Eternal Fire",
     "PCIFIC Esports":           "PCIFIC Esports",
 
@@ -49,12 +57,15 @@ TEAM_ALIASES: dict[str, str] = {
     "Kiwoon DRX":               "DRX",
     "ZETA DIVISION":            "ZETA DIVISION",
     "Paper Rex":                "Paper Rex",
+    "PRX":                      "Paper Rex",
     "BOOM Esports":             "BOOM Esports",
     "Team Secret":              "Team Secret",
     "Global Esports":           "Global Esports",
+    "GE":                       "Global Esports",
     "Rex Regum Qeon":           "Rex Regum Qeon",
     "RRQ":                      "Rex Regum Qeon",
     "FULL SENSE":               "FULL SENSE",
+    "FS":                       "FULL SENSE",
     "Talon Esports":            "FULL SENSE",
 
     # ── VCT China ───────────────────────────────────────────────────────
@@ -74,10 +85,14 @@ TEAM_ALIASES: dict[str, str] = {
     "Titan Esports Club":       "Titan Esports Club",
     "TEC":                      "Titan Esports Club",
     "Xi Lai Gaming":            "Xi Lai Gaming",
+    "XLG":                      "Xi Lai Gaming",
 }
 
 # Derived set of all canonical names (used for quick membership checks)
 CANONICAL_TEAMS: set[str] = set(TEAM_ALIASES.values())
+
+# Uppercase index for case-insensitive lookups — input is .upper()'d before lookup
+_UPPER_ALIASES: dict[str, str] = {k.upper(): v for k, v in TEAM_ALIASES.items()}
 
 # ── Masters London 2026 qualified teams ─────────────────────────────────────
 # Fill these in manually — use canonical names from TEAM_ALIASES above
@@ -121,9 +136,10 @@ def involves_masters_london_team(team_a: str, team_b: str) -> bool:
 def resolve_team(name: str) -> str | None:
     """
     Return the canonical team name for a given VLR.gg display name.
+    Tries an exact match first, then a case-insensitive match.
     Returns None if the team is not a franchised VCT team.
     """
-    return TEAM_ALIASES.get(name)
+    return _UPPER_ALIASES.get(name.upper())
 
 
 def is_franchised_match(team_a: str, team_b: str) -> bool:

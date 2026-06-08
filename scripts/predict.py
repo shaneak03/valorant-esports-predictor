@@ -27,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.data.dataset import MatchDataset
 from src.data.normalizer import Normalizer
+from src.data.team_filter import resolve_team
 from src.models.predictor import ValorantPredictor
 from src.evaluation.calibration import TemperatureScaler
 
@@ -51,6 +52,11 @@ def main():
     parser.add_argument("--data-dir", default="data/processed")
     parser.add_argument("--device", default="cpu")
     args = parser.parse_args()
+
+    # Normalise team names so plain-ASCII input works
+    # e.g. "LEVIATAN" -> "LEVIATÁN", "NRG Esports" -> "NRG"
+    args.team_a = resolve_team(args.team_a) or args.team_a
+    args.team_b = resolve_team(args.team_b) or args.team_b
 
     model_cfg = load_config(args.model_config)
     device = torch.device(args.device)
