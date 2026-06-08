@@ -62,8 +62,11 @@ function TeamLogo({ team, size = 16 }: { team: string; size?: number }) {
   const src = TEAM_LOGOS[team];
   if (!src) return null;
   return (
-    <img src={src} alt="" width={size} height={size} className="shrink-0 object-contain"
-      onError={(e) => { e.currentTarget.style.display = "none"; }} />
+    <span className="inline-flex shrink-0 items-center justify-center rounded-sm bg-white/15"
+      style={{ width: size + 4, height: size + 4 }}>
+      <img src={src} alt="" width={size} height={size} className="object-contain"
+        onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }} />
+    </span>
   );
 }
 
@@ -582,10 +585,10 @@ function TeamBreakdown({ data }: { data: EdaFullData }) {
                   formatter={((v: number, name: string) => [`${v.toFixed(1)}%`, name]) as Fmt} />
                 <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8 }}
                   formatter={(value) => (
-                    <span style={{ color: value === "Attack" ? "#FF7F8A" : "#3D9BFF", fontSize: 10 }}>{value} (T-side / CT-side)</span>
+                    <span style={{ color: value === "Attack" ? "#FF8080" : "#74B9FF", fontSize: 10 }}>{value}</span>
                   )} />
-                <Bar dataKey="Attack"  fill="#FF7F8A" radius={[2, 2, 0, 0]} maxBarSize={24} />
-                <Bar dataKey="Defence" fill="#3D9BFF" radius={[2, 2, 0, 0]} maxBarSize={24} />
+                <Bar dataKey="Attack"  fill="#FF8080" radius={[2, 2, 0, 0]} maxBarSize={24} />
+                <Bar dataKey="Defence" fill="#74B9FF" radius={[2, 2, 0, 0]} maxBarSize={24} />
               </BarChart>
             </ResponsiveContainer>
           )}

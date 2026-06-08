@@ -12,10 +12,10 @@ interface Props {
 }
 
 const REGION_COLORS: Record<string, string> = {
-  Americas: "#3D9BFF",
-  EMEA:     "#FF9F3A",
-  Pacific:  "#00C87A",
-  China:    "#FF4655",
+  Americas: "#FF7A00",
+  EMEA:     "#B6FF00",
+  Pacific:  "#00E5FF",
+  China:    "#FF3B3B",
 };
 
 export default function TeamSelector({ label, value, onChange, exclude, teamsByRegion }: Props) {
@@ -59,14 +59,17 @@ export default function TeamSelector({ label, value, onChange, exclude, teamsByR
           {value ? (
             <span className="flex items-center gap-3">
               {logoSrc && (
-                <img
-                  src={logoSrc}
-                  alt={value}
-                  width={36}
-                  height={36}
-                  className="shrink-0 object-contain"
-                  onError={(e) => { e.currentTarget.style.display = "none"; }}
-                />
+                <span className="inline-flex shrink-0 items-center justify-center rounded bg-white/15"
+                  style={{ width: 44, height: 44 }}>
+                  <img
+                    src={logoSrc}
+                    alt={value}
+                    width={36}
+                    height={36}
+                    className="object-contain"
+                    onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+                  />
+                </span>
               )}
               <span>
                 <span className="block font-display text-3xl font-extrabold uppercase tracking-wide text-vcream">
@@ -138,14 +141,17 @@ export default function TeamSelector({ label, value, onChange, exclude, teamsByR
                     ].join(" ")}
                   >
                     {tLogo && (
-                      <img
-                        src={tLogo}
-                        alt={team}
-                        width={20}
-                        height={20}
-                        className="shrink-0 object-contain"
-                        onError={(e) => { e.currentTarget.style.display = "none"; }}
-                      />
+                      <span className="inline-flex shrink-0 items-center justify-center rounded-sm bg-white/15"
+                        style={{ width: 26, height: 26 }}>
+                        <img
+                          src={tLogo}
+                          alt={team}
+                          width={20}
+                          height={20}
+                          className="object-contain"
+                          onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+                        />
+                      </span>
                     )}
                     <span
                       className="h-1.5 w-1.5 shrink-0 rounded-full"

@@ -115,14 +115,17 @@ export default function EloRankings() {
 
                 <div className="flex items-center gap-2.5 min-w-0">
                   {logoSrc && (
-                    <img
-                      src={logoSrc}
-                      alt={row.team}
-                      width={20}
-                      height={20}
-                      className="shrink-0 object-contain"
-                      onError={(e) => { e.currentTarget.style.display = "none"; }}
-                    />
+                    <span className="inline-flex shrink-0 items-center justify-center rounded-sm bg-white/15"
+                      style={{ width: 26, height: 26 }}>
+                      <img
+                        src={logoSrc}
+                        alt={row.team}
+                        width={20}
+                        height={20}
+                        className="object-contain"
+                        onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+                      />
+                    </span>
                   )}
                   <div className="min-w-0">
                     <p className="truncate font-display text-sm font-bold text-vcream">{row.team}</p>

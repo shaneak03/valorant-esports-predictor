@@ -160,24 +160,29 @@ export function getEdaFull(): Promise<EdaFullData> {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 export const REGION_COLORS: Record<string, string> = {
-  Americas: "#3D9BFF",
-  EMEA:     "#FF9F3A",
-  Pacific:  "#00C87A",
-  China:    "#FF4655",
+  Americas: "#FF7A00",
+  EMEA:     "#B6FF00",
+  Pacific:  "#00E5FF",
+  China:    "#FF3B3B",
 };
 
-// 12 distinct colours, 3 per region (base, darker, lighter)
+// Each team gets a distinct hue — within a region the 3 teams use clearly
+// different parts of the colour wheel so lines are readable on the Elo timeline.
 export const TEAM_COLORS: Record<string, string> = {
-  "G2 Esports":            "#3D9BFF",
-  "LEVIATÁN":              "#1A7EDD",
-  "NRG":                   "#88C8FF",
-  "Team Heretics":         "#FF9F3A",
-  "Team Vitality":         "#E07800",
-  "FUT Esports":           "#FFB96A",
-  "Paper Rex":             "#00C87A",
-  "FULL SENSE":            "#009A5C",
-  "Global Esports":        "#4DE8A0",
-  "EDward Gaming":         "#FF4655",
-  "Xi Lai Gaming":         "#CC2535",
-  "Dragon Ranger Gaming":  "#FF7F8A",
+  // Americas — base orange, + gold, + deep pink
+  "G2 Esports":            "#FF7A00",
+  "LEVIATÁN":              "#FFD700",
+  "NRG":                   "#FF2D78",
+  // EMEA — base lime, + violet, + sky blue
+  "Team Heretics":         "#B6FF00",
+  "Team Vitality":         "#BF5FFF",
+  "FUT Esports":           "#00BFFF",
+  // Pacific — base cyan, + spring green, + blue
+  "Paper Rex":             "#00E5FF",
+  "FULL SENSE":            "#00FF7A",
+  "Global Esports":        "#4D80FF",
+  // China — base red, + orchid pink, + amber
+  "EDward Gaming":         "#FF3B3B",
+  "Xi Lai Gaming":         "#FF7FD4",
+  "Dragon Ranger Gaming":  "#FF9500",
 };

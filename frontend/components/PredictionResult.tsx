@@ -47,14 +47,17 @@ function TeamLogo({ team, size = 32 }: { team: string; size?: number }) {
   const src = TEAM_LOGOS[team];
   if (!src) return null;
   return (
-    <img
-      src={src}
-      alt={team}
-      width={size}
-      height={size}
-      className="shrink-0 object-contain"
-      onError={(e) => { e.currentTarget.style.display = "none"; }}
-    />
+    <span className="inline-flex shrink-0 items-center justify-center rounded bg-white/15"
+      style={{ width: size + 6, height: size + 6 }}>
+      <img
+        src={src}
+        alt={team}
+        width={size}
+        height={size}
+        className="object-contain"
+        onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }}
+      />
+    </span>
   );
 }
 
