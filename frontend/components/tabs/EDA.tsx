@@ -317,7 +317,7 @@ function MapWinRates({ data }: { data: EdaFullData }) {
                       {/* Map image — reserve a fixed slot; shows when user drops image */}
                       <div className="h-10 w-16 overflow-hidden rounded border border-vborder/40 bg-velev">
                         {imgSrc && (
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img src={imgSrc} alt={mapName}
                             className="h-full w-full object-cover"
                             onError={(e) => { e.currentTarget.style.display = "none"; }} />

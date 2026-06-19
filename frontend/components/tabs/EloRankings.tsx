@@ -49,8 +49,6 @@ export default function EloRankings() {
   const filtered =
     regionFilter === "All" ? rankings : rankings.filter((r) => r.region === regionFilter);
 
-  const maxElo = Math.max(...filtered.map((r) => r.elo), 1600);
-  const minElo = Math.min(...filtered.map((r) => r.elo), 1400);
 
   return (
     <div>
