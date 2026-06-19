@@ -67,10 +67,11 @@ def main():
                         help="Checkpoint file path for resuming interrupted scrapes")
     parser.add_argument("--save-every", type=int, default=50,
                         help="Save checkpoint every N match pages processed (default 50)")
-    parser.add_argument("--force-listing-pages", type=int, default=5, metavar="N",
-                        help="Re-fetch the first N listing pages even if cached (default 5). "
+    parser.add_argument("--force-listing-pages", type=int, default=10, metavar="N",
+                        help="Re-fetch the first N listing pages even if cached (default 10). "
                              "New matches always appear on the first few pages, so this is "
-                             "how you pick up matches added since the last scrape.")
+                             "how you pick up matches added since the last scrape. "
+                             "Increase if you haven't scraped for a long time.")
     args = parser.parse_args()
 
     scraper = VLRScraper(cache_dir=args.cache_dir, requests_per_second=args.rate)
@@ -120,19 +121,20 @@ def main():
             log.info("Progress: %d/%d processed | %d kept | %d skipped low-tier",
                      i + 1, len(remaining), len(matches), skipped_tier)
 
-    # Final save
+    # Final save — output JSON
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w") as f:
         json.dump(matches, f, indent=2)
 
-    # Clean up checkpoint now that we're done
-    cp = Path(args.checkpoint)
-    if cp.exists():
-        cp.unlink()
+    # Keep the checkpoint so the next run skips already-processed IDs.
+    # Only the match IDs are needed going forward; store a compact version.
+    save_checkpoint(args.checkpoint, matches, done_ids)
 
     log.info("Done. Saved %d matches to %s (skipped %d below tier %d)",
              len(matches), out_path, skipped_tier, args.min_tier)
+    log.info("Checkpoint updated: %d match IDs marked as seen — next run will only process new matches.",
+             len(done_ids))
 
 
 if __name__ == "__main__":

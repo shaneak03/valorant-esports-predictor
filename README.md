@@ -4,6 +4,8 @@ A transformer-based model that predicts which team wins a professional Valorant 
 
 Built to predict Masters London 2026 matches.
 
+> **Current standings (Elo, all-time):** Paper Rex 1796 · NRG 1728 · G2 Esports 1718 · Team Heretics 1666 · EDward Gaming 1652 · FULL SENSE 1642 · Xi Lai Gaming 1627 · LEVIATÁN 1617 · Team Vitality 1616 · FUT Esports 1568 · Global Esports 1558 · Dragon Ranger Gaming 1502
+
 ---
 
 ## How It Works
@@ -124,7 +126,7 @@ val_esports_predictor/
 │   └── predict.py                  # CLI: predict a single upcoming match
 ├── notebooks/
 │   ├── 02_simple_model.ipynb       # Logistic regression / MLP / TinyTransformer experiments
-│   └── 03_masters_london_eda.ipynb # Per-team EDA: map win rates, permabans, recent form
+│   └── 03_masters_london_eda.ipynb # Team EDA (sections 1-8) + predictive EDA (sections 9a-9g)
 ├── configs/
 │   ├── model_config.yaml           # Architecture hyperparameters
 │   └── training_config.yaml        # Training hyperparameters
@@ -196,28 +198,29 @@ val_esports_predictor/
 
 ## Feature Vector (16 scalars per historical match)
 
-| # | Feature | Description |
-|---|---|---|
-| 0 | `win_binary` | Did this team win the series? (1 or 0) |
-| 1 | `maps_won` | Maps this team won |
-| 2 | `maps_lost` | Maps opponent won |
-| 3 | `maps_played` | Total maps in the series |
-| 4 | `map_win_rate` | maps_won / maps_played |
-| 5 | `map_score_diff` | maps_won − maps_lost |
-| 6 | `tournament_tier` | 0=Challengers, 1=VCT League, 2=Masters/Champions |
-| 7 | `bracket_stage` | 0=groups, 1=playoffs, 2=grand final |
-| 8 | `opponent_elo` | Elo rating of the opponent at match time |
-| 9 | `days_since_match` | Days before the target match (recency signal) |
-| 10 | `max_round_streak` | Longest consecutive round win streak across maps |
-| 11 | `pistol_win_rate` | Fraction of pistol rounds (rounds 1+13) won, averaged across maps |
-| 12 | `overtime_rate` | Fraction of maps that went to overtime (>24 rounds) |
-| 13 | `avg_round_win_rate` | Average round win rate across all maps (dominance signal) |
-| 14 | `avg_attack_win_rate` | Average T-side round win rate (attack strength) |
-| 15 | `avg_defense_win_rate` | Average CT-side round win rate (defense strength) |
+| # | Feature | Description | Status |
+|---|---|---|---|
+| 0 | `win_binary` | Did this team win the series? (1 or 0) | ✅ Keep |
+| 1 | `maps_won` | Maps this team won | ✅ Keep |
+| 2 | `maps_lost` | Maps opponent won | ⚠️ Redundant (`maps_played − maps_won`) |
+| 3 | `maps_played` | Total maps in the series (2-0 vs 2-1 signal) | ✅ Keep |
+| 4 | `map_win_rate` | maps_won / maps_played | ⚠️ Redundant |
+| 5 | `map_score_diff` | maps_won − maps_lost | ⚠️ Redundant |
+| 6 | `tournament_tier` | 0=Challengers, 1=VCT League, 2=Masters/Champions | ✅ Keep |
+| 7 | `bracket_stage` | 0=groups, 1=playoffs, 2=grand final | ✅ Keep |
+| 8 | `opponent_elo` | Elo rating of the opponent at match time | ✅ Keep |
+| 9 | `days_since_match` | Days before the target match (recency signal) | ✅ Keep |
+| 10 | `max_round_streak` | Longest consecutive round win streak across maps | ⚠️ Noisy — no EDA support |
+| 11 | `pistol_win_rate` | Fraction of pistol rounds (rounds 1+13) won, averaged across maps | ✅ Keep — r=0.454 with round WR, 72.8% map predictor |
+| 12 | `overtime_rate` | Fraction of maps that went to overtime (>24 rounds) | ⚠️ Noisy — captures luck equally for W and L |
+| 13 | `avg_round_win_rate` | Average round win rate across all maps (dominance signal) | ✅ Keep |
+| 14 | `avg_attack_win_rate` | Average T-side round win rate | ✅ Keep |
+| 15 | `avg_defense_win_rate` | Average CT-side round win rate | ✅ Keep |
 
-Each token also carries two embeddings added on top:
-- **Map embedding** (16-dim): which map was played
+Each token also carries one embedding added on top:
 - **Meta period embedding** (64-dim): which Valorant act/patch the match was played in (36 defined periods + unknown)
+
+> **Note:** A map embedding (16-dim) also exists in the architecture but is currently unused — `map_idx` is hardcoded to `UNKNOWN_MAP_IDX` for all historical entries, making it a learned constant. It is a candidate for removal or repurposing.
 
 In addition, each team's **current Elo** at prediction time is passed directly to the classifier (not through the transformer), giving the model an explicit "who is stronger right now" signal alongside the sequential match history.
 
@@ -292,3 +295,43 @@ The normalizer is fit on the train split only. Val and test use the same train s
 | Brier Score | 0.250 | <0.220 | 0.233 |
 | Log-loss | 0.693 | <0.650 | 0.658 |
 | ECE | — | <0.05 | **0.040** ✅ |
+
+---
+
+## EDA Findings (`notebooks/03_masters_london_eda.ipynb`)
+
+Key results from the predictive EDA (sections 9a–9g, full historical dataset, n=1,910 matches):
+
+### What predicts a win
+
+| Signal | Finding |
+|---|---|
+| **Elo difference** | Elo favourite wins 63.6% of the time. Correlation with outcome: r = 0.257 (p < 0.0001). Upset rate falls sharply above a 150-point gap. |
+| **Recent form (last 5 series)** | Team with better recent form wins 60.6% of the time. r = 0.208 (p < 0.0001). Independent of Elo — combining both signals outperforms either alone. |
+| **Pistol rounds** | Team with the higher pistol win rate wins the map **72.8%** of the time (n=2,390 maps). Pearson r between pistol WR and round WR = 0.454. Strongest map-level predictor available in the data. |
+| **Series score** | 60% of series end 2-0. Larger Elo gaps → higher sweep rate. Upsets are more common in 2-1 series (the underdog already proved it can win a map). |
+| **Side dominance** | Map winners and losers have nearly identical attack/defence imbalance (~+0.003). The separator is **absolute** round win rate (winners: 31.8% each side; losers: 17.8%), not which side they favour. Being T-dominant or CT-dominant does not predict winning. |
+| **Cross-region matchups** | Elo is **more** accurate cross-region (63.9%) than same-region (58.7%). Same-region teams cluster in Elo and know each other deeply, producing more upsets. |
+
+### Feature evaluation
+
+**5 current scalars are redundant and should be removed:**
+
+| Feature | Problem |
+|---|---|
+| `maps_lost` | Exactly `maps_played − maps_won` — zero new information |
+| `map_win_rate` | Exactly `maps_won / maps_played` — zero new information |
+| `map_score_diff` | Exactly `maps_won − maps_lost` — zero new information |
+| `max_round_streak` | No EDA support; noisy relative to `avg_round_win_rate` |
+| `overtime_rate` | Captures luck in close games equally for winners and losers |
+
+**The map embedding is dead weight:** `map_idx` is hardcoded to `UNKNOWN_MAP_IDX = 11` for every historical entry. The model learns a single constant offset — 320 parameters that contribute nothing.
+
+**4 signals worth adding:**
+
+| Feature | Rationale |
+|---|---|
+| `own_elo` (per history entry) | History has `opponent_elo` but not the team's own Elo at that time. Needed to distinguish "beat an 1800-Elo opponent when we were 1750" from "beat them when we were 1400". |
+| `round_margin` | `(rounds_won − rounds_lost) / map_length` — measures dominance, not just frequency. Two teams can both have 55% round win rate but one wins 13-7 and the other 13-12. |
+| `recent_3wr` | Explicit last-3-series win rate at each point in history. The transformer infers this via attention but an explicit scalar removes ambiguity and helps with padded early sequences. |
+| `h2h_wr` | Head-to-head record between the two specific teams being predicted. Match-level feature injected at the classifier head alongside Elo — the transformer cannot derive this since it encodes each team independently. |
