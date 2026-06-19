@@ -22,6 +22,7 @@ export default function Navbar({ activeTab, onTabChange, apiOnline }: Props) {
       <div className="flex h-8 items-center justify-between bg-accent px-5">
         <div className="flex items-center gap-2.5">
           {/* Drop vct-logo.png in frontend/public/ */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/vct_masters.png"
             alt="VCT"

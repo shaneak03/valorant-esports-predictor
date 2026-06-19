@@ -64,6 +64,7 @@ function TeamLogo({ team, size = 16 }: { team: string; size?: number }) {
   return (
     <span className="inline-flex shrink-0 items-center justify-center rounded-sm bg-white/15"
       style={{ width: size + 4, height: size + 4 }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" width={size} height={size} className="object-contain"
         onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }} />
     </span>
@@ -316,6 +317,7 @@ function MapWinRates({ data }: { data: EdaFullData }) {
                       {/* Map image — reserve a fixed slot; shows when user drops image */}
                       <div className="h-10 w-16 overflow-hidden rounded border border-vborder/40 bg-velev">
                         {imgSrc && (
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={imgSrc} alt={mapName}
                             className="h-full w-full object-cover"
                             onError={(e) => { e.currentTarget.style.display = "none"; }} />
@@ -465,21 +467,9 @@ function H2HMatrix({ data }: { data: EdaFullData }) {
           ))}
         </tbody>
       </table>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-vborder px-4 py-2.5">
-        <span className="font-sans text-[10px] text-vmuted">Row win rate vs column team</span>
-        <span className="flex items-center gap-1.5 font-sans text-[10px] text-vmuted">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: "rgba(0,200,122,0.45)" }} />
-          Row dominates
-        </span>
-        <span className="flex items-center gap-1.5 font-sans text-[10px] text-vmuted">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: "rgba(255,70,85,0.45)" }} />
-          Column dominates
-        </span>
-        <span className="flex items-center gap-1.5 font-sans text-[10px] text-vmuted">
-          <span className="font-bold text-vmuted">—</span>
-          Never played
-        </span>
-      </div>
+      <p className="border-t border-vborder px-4 py-2 font-sans text-[10px] text-vmuted">
+        Row team win rate vs column team · Green = row dominates · Red = column dominates · — = never played
+      </p>
     </div>
   );
 }
@@ -623,12 +613,11 @@ function TeamBreakdown({ data }: { data: EdaFullData }) {
                 formatter={((v: number, name: string, item: { payload: { played: number } }) =>
                   [`${v.toFixed(1)}% (${item.payload.played} maps)`, "Play frequency"]) as Fmt} />
               <Bar dataKey="Play Freq" radius={[0, 2, 2, 0]} maxBarSize={18}>
-                {permaBanData.map((entry, i) => {
-                  const t = permaBanData.length > 1 ? i / (permaBanData.length - 1) : 1;
-                  const r = Math.round(255 * (1 - t));
-                  const g = Math.round(200 * t);
-                  return <Cell key={entry.map} fill={`rgb(${r},${g},${Math.round(85 * (1 - t))})`} />;
-                })}
+                {permaBanData.map((entry, i) => (
+                  <Cell key={entry.map}
+                    fill={i === 0 ? "#FF4655" : i === permaBanData.length - 1 ? "#00C87A" : teamColor}
+                    fillOpacity={0.7 + i * 0.04} />
+                ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
