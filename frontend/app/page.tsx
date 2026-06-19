@@ -22,7 +22,7 @@ export default function Home() {
   return (
     <>
       <Navbar activeTab={activeTab} onTabChange={setActiveTab} apiOnline={apiOnline} />
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 pb-8 pt-[78px]">
         {activeTab === "predictor" && <MatchPredictor />}
         {activeTab === "analysis"  && <TeamAnalysis />}
         {activeTab === "rankings"  && <EloRankings />}

@@ -74,7 +74,7 @@ export default function PredictionResult({ result }: { result: PR }) {
         </span>
       </div>
 
-      <div className="px-8 py-8">
+      <div className="px-4 py-6 sm:px-8 sm:py-8">
         <div className="space-y-7">
           {/* Team A */}
           <div className={isAWinner ? "rounded border border-accent/20 bg-accent/5 p-4 -mx-4" : ""}>
@@ -97,7 +97,7 @@ export default function PredictionResult({ result }: { result: PR }) {
               </div>
               <span
                 className={[
-                  "font-display text-4xl font-extrabold tabular-nums",
+                  "font-display text-3xl font-extrabold tabular-nums sm:text-4xl",
                   isAWinner ? "text-accent" : "text-vmuted",
                 ].join(" ")}
               >
@@ -130,7 +130,7 @@ export default function PredictionResult({ result }: { result: PR }) {
               </div>
               <span
                 className={[
-                  "font-display text-4xl font-extrabold tabular-nums",
+                  "font-display text-3xl font-extrabold tabular-nums sm:text-4xl",
                   !isAWinner ? "text-accent" : "text-vmuted",
                 ].join(" ")}
               >
@@ -149,7 +149,7 @@ export default function PredictionResult({ result }: { result: PR }) {
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <TeamLogo team={result.team_a} size={24} />
-              <p className="mt-1 font-display text-3xl font-extrabold tabular-nums text-vcream">
+              <p className="mt-1 font-display text-2xl font-extrabold tabular-nums text-vcream sm:text-3xl">
                 {result.elo_a}
               </p>
               <p className="mt-1 font-display text-[10px] uppercase tracking-[0.2em] text-vmuted">
@@ -161,7 +161,7 @@ export default function PredictionResult({ result }: { result: PR }) {
             </div>
             <div className="text-center">
               <TeamLogo team={result.team_b} size={24} />
-              <p className="mt-1 font-display text-3xl font-extrabold tabular-nums text-vcream">
+              <p className="mt-1 font-display text-2xl font-extrabold tabular-nums text-vcream sm:text-3xl">
                 {result.elo_b}
               </p>
               <p className="mt-1 font-display text-[10px] uppercase tracking-[0.2em] text-vmuted">

@@ -87,9 +87,9 @@ export default function EloRankings() {
       {error && <p className="text-center font-sans text-sm text-red-400">{error}</p>}
 
       {!loading && !error && (
-        <div className="rounded border border-vborder bg-vcard overflow-hidden">
+        <div className="overflow-x-auto rounded border border-vborder bg-vcard">
           {/* Header */}
-          <div className="grid grid-cols-[40px_1fr_80px_80px_80px_60px_80px] gap-2 border-b border-vborder bg-velev px-4 py-2.5 text-[9px] font-bold uppercase tracking-[0.28em] text-vmuted">
+          <div className="grid min-w-[560px] grid-cols-[40px_1fr_80px_80px_80px_60px_80px] gap-2 border-b border-vborder bg-velev px-4 py-2.5 text-[9px] font-bold uppercase tracking-[0.28em] text-vmuted">
             <span>#</span>
             <span>Team</span>
             <span className="text-right">Elo</span>
@@ -106,7 +106,7 @@ export default function EloRankings() {
             return (
               <div
                 key={row.team}
-                className="grid grid-cols-[40px_1fr_80px_80px_80px_60px_80px] items-center gap-2 border-b border-vborder/50 px-4 py-3 last:border-0 hover:bg-velev/60 transition-colors"
+                className="grid min-w-[560px] grid-cols-[40px_1fr_80px_80px_80px_60px_80px] items-center gap-2 border-b border-vborder/50 px-4 py-3 last:border-0 hover:bg-velev/60 transition-colors"
               >
                 <RankBadge rank={row.rank} />
 

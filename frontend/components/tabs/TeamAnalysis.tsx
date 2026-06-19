@@ -97,7 +97,7 @@ export default function TeamAnalysis() {
             <div className="flex items-center gap-4">
               <TeamLogo team={stats.team} size={56} />
               <div className="flex-1">
-                <h3 className="font-display text-3xl font-extrabold uppercase tracking-[0.12em] text-vcream">
+                <h3 className="font-display text-xl font-extrabold uppercase tracking-[0.12em] text-vcream sm:text-3xl">
                   {stats.team}
                 </h3>
                 <span
@@ -108,7 +108,7 @@ export default function TeamAnalysis() {
                 </span>
               </div>
               <div className="text-right">
-                <p className="font-display text-4xl font-extrabold" style={{ color: teamColor }}>
+                <p className="font-display text-3xl font-extrabold sm:text-4xl" style={{ color: teamColor }}>
                   {Math.round(stats.elo)}
                 </p>
                 <p className="font-display text-[9px] uppercase tracking-[0.3em] text-vmuted">Elo Rating</p>
