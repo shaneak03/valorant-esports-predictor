@@ -73,7 +73,7 @@ export default function TeamSelector({ label, value, onChange, exclude, teamsByR
                 </span>
               )}
               <span>
-                <span className="block font-display text-3xl font-extrabold uppercase tracking-wide text-vcream">
+                <span className="block font-display text-xl font-extrabold uppercase tracking-wide text-vcream sm:text-3xl">
                   {value}
                 </span>
                 <span className="mt-1 flex items-center gap-2">
@@ -91,7 +91,7 @@ export default function TeamSelector({ label, value, onChange, exclude, teamsByR
               </span>
             </span>
           ) : (
-            <span className="font-display text-2xl font-semibold uppercase tracking-wider text-vmuted">
+            <span className="font-display text-lg font-semibold uppercase tracking-wider text-vmuted sm:text-2xl">
               Select Team
             </span>
           )}
