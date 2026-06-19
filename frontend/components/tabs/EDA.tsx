@@ -64,6 +64,7 @@ function TeamLogo({ team, size = 16 }: { team: string; size?: number }) {
   return (
     <span className="inline-flex shrink-0 items-center justify-center rounded-sm bg-white/15"
       style={{ width: size + 4, height: size + 4 }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" width={size} height={size} className="object-contain"
         onError={(e) => { (e.currentTarget.parentElement as HTMLElement).style.display = "none"; }} />
     </span>
@@ -316,6 +317,7 @@ function MapWinRates({ data }: { data: EdaFullData }) {
                       {/* Map image — reserve a fixed slot; shows when user drops image */}
                       <div className="h-10 w-16 overflow-hidden rounded border border-vborder/40 bg-velev">
                         {imgSrc && (
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={imgSrc} alt={mapName}
                             className="h-full w-full object-cover"
                             onError={(e) => { e.currentTarget.style.display = "none"; }} />

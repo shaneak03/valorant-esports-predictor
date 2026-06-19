@@ -61,6 +61,7 @@ export default function TeamSelector({ label, value, onChange, exclude, teamsByR
               {logoSrc && (
                 <span className="inline-flex shrink-0 items-center justify-center rounded bg-white/15"
                   style={{ width: 44, height: 44 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={logoSrc}
                     alt={value}
@@ -143,6 +144,7 @@ export default function TeamSelector({ label, value, onChange, exclude, teamsByR
                     {tLogo && (
                       <span className="inline-flex shrink-0 items-center justify-center rounded-sm bg-white/15"
                         style={{ width: 26, height: 26 }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={tLogo}
                           alt={team}

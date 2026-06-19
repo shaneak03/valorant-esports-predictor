@@ -104,7 +104,6 @@ export default function EloRankings() {
           {filtered.map((row) => {
             const regionColor = REGION_COLORS[row.region] ?? "#6B7E8F";
             const logoSrc = TEAM_LOGOS[row.team];
-            const eloNorm = maxElo > minElo ? (row.elo - minElo) / (maxElo - minElo) : 1;
 
             return (
               <div
@@ -117,6 +116,7 @@ export default function EloRankings() {
                   {logoSrc && (
                     <span className="inline-flex shrink-0 items-center justify-center rounded-sm bg-white/15"
                       style={{ width: 26, height: 26 }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={logoSrc}
                         alt={row.team}

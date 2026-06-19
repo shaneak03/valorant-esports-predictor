@@ -22,6 +22,7 @@ function TeamLogo({ team, size = 32 }: { team: string; size?: number }) {
   return (
     <span className="inline-flex shrink-0 items-center justify-center rounded bg-white/15"
       style={{ width: size + 6, height: size + 6 }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={team}
