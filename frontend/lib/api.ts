@@ -1,4 +1,4 @@
-export const API_BASE = "http://localhost:5000";
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
 
 export type Tab = "predictor" | "analysis" | "rankings" | "eda";
 

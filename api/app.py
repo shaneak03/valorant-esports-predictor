@@ -547,4 +547,4 @@ def _run_prediction(team_a: str, team_b: str, date: str | None = None) -> dict:
 
 if __name__ == "__main__":
     load_resources()
-    app.run(debug=False, port=5000)
+    app.run(host="0.0.0.0", debug=False, port=5000)
